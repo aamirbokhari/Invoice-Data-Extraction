@@ -1,3 +1,6 @@
+
+#without image processing
+
 import os
 import pandas as pd
 from openpyxl import load_workbook
@@ -5,7 +8,10 @@ from openpyxl.styles import PatternFill
 from paddleocr import PaddleOCR
 import spacy
 
-# Define a file to keep track of processed invoices
+
+# pip install spacy
+# python -m spacy download en_core_web_sm
+
 PROCESSED_FILE_LIST = "processed_files.txt"
 
 def save_to_excel(data, file_name="invoice_data.xlsx"):
@@ -20,27 +26,26 @@ def save_to_excel(data, file_name="invoice_data.xlsx"):
     if os.path.exists(file_name):
         # Load existing data
         existing_df = pd.read_excel(file_name)
-        # Concatenate with new data and drop duplicates based on Invoice Number
         df = pd.concat([existing_df, df], ignore_index=True).drop_duplicates(subset="Invoice Number", keep="last")
     
-    # Save DataFrame to Excel
+    
     df.to_excel(file_name, index=False)
     print(f"Data saved to {file_name} successfully.")
     
-    # Open the Excel file using openpyxl
+  
     wb = load_workbook(file_name)
     ws = wb.active
 
-    # Define the fill color for blank cells (yellow fill)
+   
     yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
     
-    # Iterate through cells, applying yellow fill for blank cells
+   
     for row in ws.iter_rows(min_row=2, max_col=len(headers), max_row=len(df)+1):
         for cell in row:
-            if cell.value in [None, ""]:  # Check if the cell is blank
+            if cell.value in [None, ""]:  
                 cell.fill = yellow_fill
     
-    # Save the modified Excel file
+
     wb.save(file_name)
     print(f"Updated {file_name} with colored blank cells.")
 

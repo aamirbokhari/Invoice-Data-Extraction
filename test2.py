@@ -1,3 +1,7 @@
+
+#wiht image processing
+
+
 import os
 import pandas as pd
 from openpyxl import load_workbook
@@ -8,7 +12,10 @@ from pdf2image import convert_from_path
 import cv2
 import numpy as np
 
-# Define a file to keep track of processed invoices
+# pip install spacy
+# python -m spacy download en_core_web_sm
+
+
 PROCESSED_FILE_LIST = "processed_files1.txt"
 
 def save_to_excel(data, file_name="invoice_data1.xlsx"):
@@ -17,41 +24,40 @@ def save_to_excel(data, file_name="invoice_data1.xlsx"):
     """
     headers = ["Invoice Number", "Customer Name", "Ship To", "Date", "Balance Due", "Item", "Quantity", "Amount"]
 
-    # Create a DataFrame
+  
     df = pd.DataFrame(data, columns=headers)
     
     if os.path.exists(file_name):
-        # Load existing data
+        
         existing_df = pd.read_excel(file_name)
-        # Concatenate with new data and drop duplicates based on Invoice Number
+        
         df = pd.concat([existing_df, df], ignore_index=True).drop_duplicates(subset="Invoice Number", keep="last")
     
-    # Save DataFrame to Excel
+   
     df.to_excel(file_name, index=False)
     print(f"Data saved to {file_name} successfully.")
     
-    # Open the Excel file using openpyxl
+   
     wb = load_workbook(file_name)
     ws = wb.active
 
-    # Define the fill color for blank cells (yellow fill)
+
     yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
     
-    # Iterate through cells, applying yellow fill for blank cells
+  
     for row in ws.iter_rows(min_row=2, max_col=len(headers), max_row=len(df)+1):
         for cell in row:
-            if cell.value in [None, ""]:  # Check if the cell is blank
+            if cell.value in [None, ""]: 
                 cell.fill = yellow_fill
     
-    # Save the modified Excel file
+   
     wb.save(file_name)
     print(f"Updated {file_name} with colored blank cells.")
 
 def image_processing(image):
-    """
-    Process the image for better OCR performance.
-    """
-    # Convert to grayscale
+    # include ur methods , which works out the best
+
+   
     gray = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
     
     # # Apply thresholding to binarize the image
@@ -155,7 +161,7 @@ if __name__ == "__main__":
     folder_path = r'C:\Users\Admin\Desktop\aamir_invoice_project\invoices'
     all_invoice_data = []
 
-    # Load existing processed files
+    
     processed_files = load_processed_files()
 
     for filename in os.listdir(folder_path):
@@ -163,14 +169,14 @@ if __name__ == "__main__":
             if filename not in processed_files:
                 file_path = os.path.join(folder_path, filename)
                 
-                # Convert the PDF to images
+               
                 images = convert_from_path(file_path)
                 
                 for image in images:
-                    # Process each image before OCR
+               
                     processed_image = image_processing(image)
                     
-                    # Perform OCR on the processed image
+                    
                     invoice_data = final_list(processed_image)
                     all_invoice_data.append(invoice_data)
                 

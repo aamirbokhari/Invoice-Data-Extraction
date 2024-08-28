@@ -1,3 +1,7 @@
+
+# run test and test1.py , app.py not updated
+
+
 import re
 from PIL import Image
 import pytesseract
